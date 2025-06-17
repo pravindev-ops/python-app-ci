@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-      contents: read
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -43,12 +43,6 @@ jobs:
       - name: Update staging manifest
         run: |
           sed -i "s|image:.*|image: $IMAGE_NAME:${{ env.IMAGE_TAG }}|" manifests/stage/deployment.yaml
-
-      - name: Set authenticated remote URL
-        run: git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
-
-      - name: Set remote with PAT
-        run: git remote -v
 
       - name: Set git identity
         run: |
