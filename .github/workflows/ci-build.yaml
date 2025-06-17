@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - stage
- 
 env:
   PROJECT_ID: praveen-345
   PROJECT_NUMBER: 915484313024
