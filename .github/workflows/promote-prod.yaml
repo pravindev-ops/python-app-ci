@@ -1,9 +1,10 @@
 # .github/workflows/promote-to-prod.yaml
-name: Promote to Prod
+name: Promote to Production
 
 on:
-  workflow_dispatch:
-
+  push:
+    branches:
+      - main  
 jobs:
   promote:
     runs-on: ubuntu-latest
