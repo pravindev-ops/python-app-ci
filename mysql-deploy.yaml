@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,3 +25,17 @@ spec:
           value: admin
         - name: MYSQL_ROOT_PASSWORD
           value: admin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  ports:
+  - port: 3306
+    targetPort: 3306
+    protocol: TCP
+    name: http
+  selector:
+    app: mysql
+---
