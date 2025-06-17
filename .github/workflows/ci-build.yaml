@@ -50,11 +50,13 @@ jobs:
       - name: Set remote with PAT
         run: git remote -v
 
-      - name: Commit updated YAML
+      - name: Set git identity
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
+
+      - name: Commit and push
+        run: |
           git add manifests/stage/deployment.yaml
           git commit -m "Update image to $IMAGE_TAG [ci skip]" || echo "No changes to commit"
           git push origin stage
