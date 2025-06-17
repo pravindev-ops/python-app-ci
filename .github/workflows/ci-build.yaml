@@ -42,7 +42,9 @@ jobs:
           
       - name: Update staging manifest
         run: |
-          sed -i "s|image:.*|image: $IMAGE_NAME:${{ env.IMAGE_TAG }}|" manifests/stage/deployment.yaml
+          FULL_IMAGE="$REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ env.IMAGE_TAG }}"
+          echo "Using image: $FULL_IMAGE"
+          sed -i "s|image:.*|image: $FULL_IMAGE|" manifests/stage/deployment.yaml
 
       - name: Set git identity
         run: |
