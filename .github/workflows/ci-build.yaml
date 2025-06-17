@@ -31,10 +31,6 @@ jobs:
         run: |
           gcloud config set project $PROJECT_ID
           gcloud auth configure-docker asia-south1-docker.pkg.dev
-      - name: Build Docker image
-        run: |
-          docker build -t
-          asia-south1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$GITHUB_SHA
 
       - name: Build and push Docker image
         run: |
@@ -42,7 +38,6 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           IMAGE_TAG="v1-${SHORT_SHA}-${TIMESTAMP}"
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-
           docker build -t $REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG .
           docker push $REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
 
