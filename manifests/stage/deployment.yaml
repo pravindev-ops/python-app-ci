@@ -19,7 +19,7 @@ spec:
       serviceAccountName: demo-app-sa  # Must have access to Secret Manager
       containers:
         - name: test-app
-          image: python-app:v1-f841132-20250617122146
+          image: python-app:v1-d5db566-20250617122530
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
