@@ -1,0 +1,44 @@
+# .github/workflows/promote-to-prod.yaml
+name: Promote to Production
+on:
+  workflow_dispatch:
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage
+          fetch-depth: 0
+
+      - name: Extract image from staging deployment
+        id: extract
+        run: |
+          IMAGE=$(grep 'image:' manifests/stage/deployment.yaml | awk '{print $2}')
+          echo "STAGE_IMAGE=$IMAGE" >> $GITHUB_ENV
+          echo "Image to promote: $IMAGE"
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-branch
+
+      - name: Update prod deployment with staging image
+        run: |
+          sed -i "s|image:.*|image: $STAGE_IMAGE|" main-branch/manifests/prod/deployment.yaml
+
+      - name: Commit and push to main
+        run: |
+          cd main-branch
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifests/prod/deployment.yaml
+          git commit -m "Promote image to prod: $STAGE_IMAGE [ci skip]" || echo "No changes to commit"
+          git push origin main
+        env:
+          STAGE_IMAGE: ${{ env.STAGE_IMAGE }}
