@@ -35,6 +35,21 @@ spec:
             volumeAttributes:
               secretProviderClass: "demo-app-spc"
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service
+  namespace : app
+spec:
+  type: LoadBalancer
+  ports:
+  - name: test-service
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: test-app
+---
 apiVersion: secrets-store.csi.x-k8s.io/v1
 kind: SecretProviderClass
 metadata:
