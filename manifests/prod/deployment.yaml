@@ -49,3 +49,18 @@ spec:
       - resourceName: "projects/gke-arena/secrets/MYSQL_ROOT_PASSWORD/versions/latest"
         path: "MYSQL_ROOT_PASSWORD"
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service
+  namespace : app
+spec:
+  type: LoadBalancer
+  ports:
+  - name: test-service
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: test-app
+---
