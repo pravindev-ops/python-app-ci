@@ -1,0 +1,58 @@
+name: CI Build and Push (dev-test)
+on:
+  push:
+    branches:
+      - dev
+env:
+  PROJECT_ID: praveen-345
+  PROJECT_NUMBER: 915484313024
+  REGION: asia-south1
+  REPOSITORY: python-app
+  REPOSITORY_REGION: asia-south1
+  REPO_URL: asia-south1-docker.pkg.dev
+  IMAGE_NAME: python-app
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Authenticate to GCP using Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: projects/915484313024/locations/global/workloadIdentityPools/my-pool/providers/my-provider 
+          service_account: gke-workload@praveen-345.iam.gserviceaccount.com
+      - name: Configure gcloud
+        run: |
+          gcloud config set project $PROJECT_ID
+          gcloud auth configure-docker asia-south1-docker.pkg.dev
+
+      - name: Build and push Docker image
+        run: |
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          IMAGE_TAG="v1-${SHORT_SHA}-${TIMESTAMP}"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          docker build -t $REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG .
+          docker push $REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+          
+      - name: Update stage manifest
+        run: |
+          FULL_IMAGE="$REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ env.IMAGE_TAG }}"
+          echo "Using image: $FULL_IMAGE"
+          sed -i "s|image:.*|image: $FULL_IMAGE|" manifests/dev/deployment.yaml
+
+      - name: Set git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push
+        run: |
+          git add manifests/dev/deployment.yaml
+          git commit -m "Update image to $IMAGE_TAG [ci skip]" || echo "No changes to commit"
+          git push origin dev
