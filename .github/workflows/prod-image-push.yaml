@@ -1,5 +1,5 @@
 # .github/workflows/promote-to-prod.yaml
-name: Promote to Production
+name: Promote to Production GAR (Prod)
 
 on:
   workflow_dispatch:
