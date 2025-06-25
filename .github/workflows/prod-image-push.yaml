@@ -30,39 +30,34 @@ jobs:
       - name: Extract image details from staging deployment
         id: extract_stage_image
         run: |
-          FULL_STAGE_IMAGE=$(yq -r '.spec.template.spec.containers[0].image' manifests/stage/deployment.yaml)
-
-          if [[ -z "$FULL_STAGE_IMAGE" || "$FULL_STAGE_IMAGE" == "null" ]]; then
-            echo "❌ ERROR: Could not extract image from YAML"
-            exit 1
-          fi
-          
-          STAGE_REPO=$(echo "$FULL_STAGE_IMAGE" | cut -d':' -f1 | tr -d '\n' | xargs)
-          STAGE_TAG=$(echo "$FULL_STAGE_IMAGE" | cut -d':' -f2 | tr -d '\n' | xargs)
-          
+          FULL_STAGE_IMAGE=$(yq '.spec.template.spec.containers[0].image' manifests/stage/deployment.yaml)
+          echo "Full stage image: $FULL_STAGE_IMAGE"
+      
+          STAGE_REPO=$(echo "$FULL_STAGE_IMAGE" | cut -d':' -f1)
+          STAGE_TAG=$(echo "$FULL_STAGE_IMAGE" | cut -d':' -f2)
+      
           PROD_REPO=$(echo "$STAGE_REPO" | \
-            sed 's|praveen-345|shared-vpc-service-315|' | \
-            sed 's|python-app/python-app|prod-python-app/prod-app|' | tr -d '\n' | xargs)
-          
+                      sed 's|praveen-345|shared-vpc-service-315|' | \
+                      sed 's|python-app/python-app|prod-python-app/prod-app|')
+      
           PROD_TAG="${{ inputs.image_tag }}"
           PROD_TAG="${PROD_TAG:-$STAGE_TAG}"
-          PROD_TAG=$(echo "$PROD_TAG" | tr -d '\n' | xargs)
-          
+      
           NEW_PROD_IMAGE="${PROD_REPO}:${PROD_TAG}"
-          NEW_PROD_IMAGE=$(echo "$NEW_PROD_IMAGE" | tr -d '\n' | xargs)
+
+          echo "${STAGE_REPO}"
+          echo "${STAGE_TAG}"
+          echo "${PROD_REPO}"
+          echo "${PROD_TAG}"
           
-          # Print and inject
-          echo "🟢 STAGE_REPO = $STAGE_REPO"
-          echo "🟢 STAGE_TAG  = $STAGE_TAG"
-          echo "🟢 PROD_REPO  = $PROD_REPO"
-          echo "🟢 PROD_TAG   = $PROD_TAG"
-          echo "🟢 NEW_PROD_IMAGE = $NEW_PROD_IMAGE"
-          
-          echo "STAGE_REPO=$STAGE_REPO" >> $GITHUB_ENV
-          echo "STAGE_TAG=$STAGE_TAG" >> $GITHUB_ENV
-          echo "PROD_REPO=$PROD_REPO" >> $GITHUB_ENV
-          echo "PROD_TAG=$PROD_TAG" >> $GITHUB_ENV
-          echo "NEW_PROD_IMAGE=$NEW_PROD_IMAGE" >> $GITHUB_ENV
+          echo "STAGE_REPO=${STAGE_REPO}" >> $GITHUB_ENV
+          echo "STAGE_TAG=${STAGE_TAG}" >> $GITHUB_ENV
+          echo "PROD_REPO=${PROD_REPO}" >> $GITHUB_ENV
+          echo "PROD_TAG=${PROD_TAG}" >> $GITHUB_ENV
+          echo "NEW_PROD_IMAGE=${NEW_PROD_IMAGE}" >> $GITHUB_ENV
+      
+          echo "Image to promote (original): $FULL_STAGE_IMAGE"
+          echo "New production image will be: $NEW_PROD_IMAGE"
           
       - name: Authenticate to GCP using Workload Identity Federation
         id: auth
