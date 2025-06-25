@@ -28,11 +28,11 @@ jobs:
            sudo chmod a+x /usr/local/bin/yq
       - name: Debug - Show deployment.yaml content
         run: cat manifests/stage/deployment.yaml
-      - name: Extract image details from staging deployment
-        id: extract_stage_image
+      - name: Extract image details
         run: |
-          FULL_STAGE_IMAGE=$(yq -r '.spec.template.spec.containers[0].image' manifests/stage/deployment.yaml)
-          echo "Full stage image: $FULL_STAGE_IMAGE"
+          # Extract only the first document (index 0)
+          FULL_STAGE_IMAGE=$(yq -r '.spec.template.spec.containers[0].image | select(. != null)' manifests/stage/deployment.yaml)
+          echo "Full stage image: $FULL_STAGE_IMAGE
           STAGE_REPO=$(echo "$FULL_STAGE_IMAGE" | cut -d':' -f1)
           STAGE_TAG=$(echo "$FULL_STAGE_IMAGE" | cut -d':' -f2)
           PROD_REPO=$(echo "$STAGE_REPO" | \
