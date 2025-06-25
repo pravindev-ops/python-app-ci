@@ -46,9 +46,26 @@ jobs:
           echo "PROD_REPO=$PROD_REPO" >> $GITHUB_ENV
           echo "PROD_TAG=$PROD_TAG" >> $GITHUB_ENV
           echo "NEW_PROD_IMAGE=$NEW_PROD_IMAGE" >> $GITHUB_ENV
-          
+        
       - name: Authenticate to GCP using Workload Identity Federation
-        id: auth
+        id: auth-stage
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/915484313024/locations/global/workloadIdentityPools/my-pool/providers/my-provider 
+          service_account: gke-workload@praveen-345.iam.gserviceaccount.com
+      - name: Configure gcloud
+        run: |
+          gcloud config set project $PROJECT_ID
+          gcloud auth configure-docker asia-south1-docker.pkg.dev
+
+      - name: Pull image from staging GAR
+        run: docker pull ${{ env.STAGE_REPO }}:${{ env.STAGE_TAG }}
+
+      - name: Tag image for production GAR
+        run: docker tag ${{ env.STAGE_REPO }}:${{ env.STAGE_TAG }} ${{ env.NEW_PROD_IMAGE }}
+
+      - name: Authenticate to GCP using Workload Identity Federation
+        id: auth-prod
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/701983950006/locations/global/workloadIdentityPools/gh-prod-pool/providers/gh-prod-provider 
@@ -57,12 +74,6 @@ jobs:
         run: |
           gcloud config set project shared-vpc-service-315
           gcloud auth configure-docker asia-south1-docker.pkg.dev
-
-      - name: Pull image from staging GAR
-        run: docker pull ${{ env.STAGE_REPO }}:${{ env.STAGE_TAG }}
-
-      - name: Tag image for production GAR
-        run: docker tag ${{ env.STAGE_REPO }}:${{ env.STAGE_TAG }} ${{ env.NEW_PROD_IMAGE }}
 
       - name: Push image to production GAR
         run: docker push ${{ env.NEW_PROD_IMAGE }}
