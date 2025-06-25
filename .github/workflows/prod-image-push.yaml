@@ -45,11 +45,11 @@ jobs:
       
           NEW_PROD_IMAGE="${PROD_REPO}:${PROD_TAG}"
 
-          echo "${STAGE_REPO}"
-          echo "${STAGE_TAG}"
-          echo "${PROD_REPO}"
-          echo "${PROD_TAG}"
-          
+          # 🔍 Print before setting env
+          echo "🟢 STAGE_REPO = $STAGE_REPO"
+          echo "🟢 STAGE_TAG  = $STAGE_TAG"
+          echo "🟢 PROD_REPO  = $PROD_REPO"
+          echo "🟢 PROD_TAG   = $PROD_TAG"
           echo "STAGE_REPO=${STAGE_REPO}" >> $GITHUB_ENV
           echo "STAGE_TAG=${STAGE_TAG}" >> $GITHUB_ENV
           echo "PROD_REPO=${PROD_REPO}" >> $GITHUB_ENV
