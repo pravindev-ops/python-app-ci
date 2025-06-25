@@ -55,7 +55,7 @@ jobs:
           service_account: gke-workload@praveen-345.iam.gserviceaccount.com
       - name: Configure gcloud
         run: |
-          gcloud config set project $PROJECT_ID
+          gcloud config set project praveen-345
           gcloud auth configure-docker asia-south1-docker.pkg.dev
 
       - name: Pull image from staging GAR
