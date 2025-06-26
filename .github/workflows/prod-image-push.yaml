@@ -11,6 +11,9 @@ on:
 jobs:
   promote:
     runs-on: ubuntu-latest
+    environment: 
+      name: production     # 👈 This links to the protected environment
+      url: https://github.com
     permissions:
       id-token: write # Required for Workload Identity Federation (GCP)
       contents: write # Required to commit changes to the repo
