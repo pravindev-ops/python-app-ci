@@ -1,8 +1,8 @@
 # .github/workflows/promote-to-prod.yaml
 name: Promote to Production GAR (Prod)
 env:
-  STG_PROJECT_ID: ${STG_PROJECT_ID}
-  PROD_PROJECT_ID: ${PROD_PROJECT_ID}
+  STG_PROJECT_ID: ${{ secrets.STG_PROJECT_ID }}
+  PROD_PROJECT_ID: ${{ secrets.PROD_PROJECT_ID }}
 
 on:
   workflow_dispatch:
@@ -61,7 +61,7 @@ jobs:
           service_account: gke-workload@praveen-345.iam.gserviceaccount.com
       - name: Configure gcloud
         run: |
-          gcloud config set project ${{ env.STG_PROJECT_ID }}
+          gcloud config set project $STG_PROJECT_ID
           gcloud auth configure-docker asia-south1-docker.pkg.dev
 
       - name: Pull image from staging GAR
@@ -78,7 +78,7 @@ jobs:
           service_account: github-actions-sa@shared-vpc-service-315.iam.gserviceaccount.com
       - name: Configure gcloud
         run: |
-          gcloud config set project ${{ env.PROD_PROJECT_ID }}
+          gcloud config set project $PROD_PROJECT_ID
           gcloud auth configure-docker asia-south1-docker.pkg.dev
 
       - name: Push image to production GAR
