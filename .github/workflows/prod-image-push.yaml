@@ -1,5 +1,8 @@
 # .github/workflows/promote-to-prod.yaml
 name: Promote to Production GAR (Prod)
+env:
+  STG_PROJECT_ID: ${STG_PROJECT_ID}
+  PROD_PROJECT_ID: ${PROD_PROJECT_ID}
 
 on:
   workflow_dispatch:
@@ -58,7 +61,7 @@ jobs:
           service_account: gke-workload@praveen-345.iam.gserviceaccount.com
       - name: Configure gcloud
         run: |
-          gcloud config set project praveen-345
+          gcloud config set project ${{ env.STG_PROJECT_ID }}
           gcloud auth configure-docker asia-south1-docker.pkg.dev
 
       - name: Pull image from staging GAR
@@ -75,7 +78,7 @@ jobs:
           service_account: github-actions-sa@shared-vpc-service-315.iam.gserviceaccount.com
       - name: Configure gcloud
         run: |
-          gcloud config set project shared-vpc-service-315
+          gcloud config set project ${{ env.PROD_PROJECT_ID }}
           gcloud auth configure-docker asia-south1-docker.pkg.dev
 
       - name: Push image to production GAR
@@ -102,4 +105,19 @@ jobs:
           git commit -m "Promote image to prod: ${{ env.NEW_PROD_IMAGE }} [ci skip]" || echo "No changes to commit"
           git push origin main
 
+      - name: Send Slack success message
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data "{
+            \"text\": \":white_check_mark: *Production Deploy Succeeded!*\n> Image: ${{ env.NEW_PROD_IMAGE }}\n> Workflow: $GITHUB_WORKFLOW\n> By: $GITHUB_ACTOR\n> <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>\"
+          }" ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          STAGE_IMAGE: ${{ env.STAGE_IMAGE }}
+
+      - name: Send Slack failure message
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data "{
+            \"text\": \":x: *Production Deploy Failed!*\n> Workflow: $GITHUB_WORKFLOW\n> By: $GITHUB_ACTOR\n> <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>\"
+          }" ${{ secrets.SLACK_WEBHOOK_URL }}
 
