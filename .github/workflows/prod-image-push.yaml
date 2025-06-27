@@ -101,7 +101,7 @@ jobs:
       - name: Update prod deployment with new production image
         run: |
           cd main-branch
-          yq e "select(.kind == \"Deployment\" and .metadata.name == \"usc-prod-darknightagent-api\") | .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE)" \
+          yq e "select(.kind == \"Deployment\" and .metadata.name == \"test-app\") | .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE)" \
           -i manifests/prod/deployment.yaml
           
       - name: Commit and push to main
