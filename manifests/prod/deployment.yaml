@@ -42,10 +42,11 @@ metadata:
   namespace: app
 spec:
   ports:
-  - port: 3306
-    targetPort: 3306
-    protocol: TCP
-    name: http
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+      name: http
   selector:
     app: mysql
 ---
+
