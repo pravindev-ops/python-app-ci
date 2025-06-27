@@ -108,8 +108,8 @@ jobs:
       - name: Update prod deployment with new production image
         run: |
           cd main-branch
-          yq e "if .kind == \"Deployment\" and .metadata.name == \"test-app\" then .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE) else . end" \
-          -i manifests/prod/deployment.yaml   
+          yq -i 'select(.kind == "Deployment") .spec.template.spec.containers[0].image = "${{ env.NEW_PROD_IMAGE }}"' manifests/prod/deployment.yaml  
+
 
       
       # - name: Update prod deployment with new production image
