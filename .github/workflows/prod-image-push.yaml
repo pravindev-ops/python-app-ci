@@ -90,12 +90,21 @@ jobs:
           ref: main
           path: main-branch
 
+      # - name: Update prod deployment with new production image
+      #   run: |
+      #     # Use yq for safer updates
+      #     cd main-branch
+      #     yq e '.spec.template.spec.containers[0].image = "${{ env.NEW_PROD_IMAGE }}"' -i manifests/prod/deployment.yaml
       - name: Update prod deployment with new production image
         run: |
-          # Use yq for safer updates
           cd main-branch
-          yq e '.spec.template.spec.containers[0].image = "${{ env.NEW_PROD_IMAGE }}"' -i manifests/prod/deployment.yaml
-
+          yq e '
+           if (.kind == "Deployment" and .metadata.name == "usc-prod-darknightagent-api") then
+             .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE)
+           else
+             .
+           end
+          ' -i gcp-k8s/manifest-prod/gcp-manifest-prod.yaml
       - name: Commit and push to main
         run: |
           cd main-branch
@@ -104,6 +113,8 @@ jobs:
           git add manifests/prod/deployment.yaml
           git commit -m "Promote image to prod: ${{ env.NEW_PROD_IMAGE }} [ci skip]" || echo "No changes to commit"
           git push origin main
+
+
 
       - name: Send Slack success message
         if: success()
