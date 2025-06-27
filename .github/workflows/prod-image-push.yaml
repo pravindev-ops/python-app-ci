@@ -104,8 +104,8 @@ jobs:
         run: |
           cd main-branch
           #yq -i 'select(.kind == "Deployment") .spec.template.spec.containers[0].image = "${{ env.NEW_PROD_IMAGE }}"' manifests/prod/deployment.yaml
-          yq -i "if .kind == \"Deployment\" and .metadata.name == \"test-app\" then .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE) else . end" manifests/prod/deployment.yaml
-
+          #yq -i "if .kind == \"Deployment\" and .metadata.name == \"test-app\" then .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE) else . end" manifests/prod/deployment.yaml
+          yq -i 'if .kind == "Deployment" and .metadata.name == "test-app" then .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE) else . end' manifests/prod/deployment.yaml
 
       - name: Commit and push to main
         run: |
