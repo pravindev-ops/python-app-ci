@@ -110,7 +110,7 @@ jobs:
         run: |
           cd main-branch
           yq e "if .kind == \"Deployment\" and .metadata.name == \"test-app\" then .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE) else . end" \
-          -i -i manifests/prod/deployment.yaml
+          -i manifests/prod/deployment.yaml
 
       - name: Commit and push to main
         run: |
