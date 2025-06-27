@@ -95,15 +95,23 @@ jobs:
       #     # Use yq for safer updates
       #     cd main-branch
       #     yq e '.spec.template.spec.containers[0].image = "${{ env.NEW_PROD_IMAGE }}"' -i manifests/prod/deployment.yaml
+      
       - name: Check yq version
         run: yq --version
+      
+      # - name: Update prod deployment with new production image
+      #   run: |
+      #     cd main-branch
+      #     yq e "select(.kind == \"Deployment\" and .metadata.name == \"test-app\") | .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE)" \
+      #     -i manifests/prod/deployment.yaml
+
       
       - name: Update prod deployment with new production image
         run: |
           cd main-branch
-          yq e "select(.kind == \"Deployment\" and .metadata.name == \"test-app\") | .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE)" \
-          -i manifests/prod/deployment.yaml
-          
+          yq e "if .kind == \"Deployment\" and .metadata.name == \"test-app\" then .spec.template.spec.containers[0].image = strenv(NEW_PROD_IMAGE) else . end" \
+          -i -i manifests/prod/deployment.yaml
+
       - name: Commit and push to main
         run: |
           cd main-branch
