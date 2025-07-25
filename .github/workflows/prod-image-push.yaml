@@ -3,14 +3,22 @@ name: Promote to Production GAR (Prod)
 env:
   STG_PROJECT_ID: ${{ secrets.STG_PROJECT_ID }}
   PROD_PROJECT_ID: ${{ secrets.PROD_PROJECT_ID }}
-
 on:
   workflow_dispatch:
-    # Optional inputs for manual promotion, e.g., to override the default image tag
     inputs:
-      image_tag:
-        description: 'Optional: Specific image tag to promote (e.g., commit SHA or release version)'
-        required: false
+      approve:
+        description: 'Approved by'
+        required: true
+        type: choice
+        options: ['pravin135']
+
+# on:
+#   workflow_dispatch:
+#     # Optional inputs for manual promotion, e.g., to override the default image tag
+#     inputs:
+#       image_tag:
+#         description: 'Optional: Specific image tag to promote (e.g., commit SHA or release version)'
+#         required: false
 jobs:
   promote:
     runs-on: ubuntu-latest
