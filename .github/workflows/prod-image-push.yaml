@@ -11,13 +11,21 @@ env:
 #         required: true
 #         type: choice
 #         options: ['pravin135']
+
+on:
+  workflow_dispatch:  # Allows manual trigger from GitHub UI/API
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production  # 🔐 Only approvers can proceed!
-    steps:
-      - name: Check permissions
-        run: echo "This job can ONLY run if an approver approves it!"
+    environment: 
+      name: production
+      url: https://your-deployment-url.com  # Optional: Link to your app
+    permissions:
+      id-token: write # Required for Workload Identity Federation (GCP)
+      contents: write # Required to commit changes to the repo
+      # --- Verify permissions (optional, extra safety) ---
+
 # on:
 #   workflow_dispatch:
 #     # Optional inputs for manual promotion, e.g., to override the default image tag
@@ -25,17 +33,21 @@ jobs:
 #       image_tag:
 #         description: 'Optional: Specific image tag to promote (e.g., commit SHA or release version)'
 #         required: false
-jobs:
-  promote:
-    runs-on: ubuntu-latest
-    environment: 
-      name: production     # 👈 This links to the protected environment
-      url: https://github.com
-    permissions:
-      id-token: write # Required for Workload Identity Federation (GCP)
-      contents: write # Required to commit changes to the repo
+# jobs:
+#   promote:
+#     runs-on: ubuntu-latest
+#     environment: 
+#       name: production     # 👈 This links to the protected environment
+#       url: https://github.com
+#     permissions:
+#       id-token: write # Required for Workload Identity Federation (GCP)
+#       contents: write # Required to commit changes to the repo
     
     steps:
+      - name: Validate approver
+        run: |
+          echo "✅ Approved by: ${{ github.actor }}"
+          echo "This job can ONLY run after approval in the 'production' environment."
       - name: Checkout stage branch (to get current stage image)
         uses: actions/checkout@v4
         with:
