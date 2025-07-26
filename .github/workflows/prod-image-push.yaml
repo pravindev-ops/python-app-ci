@@ -3,15 +3,21 @@ name: Promote to Production GAR (Prod)
 env:
   STG_PROJECT_ID: ${{ secrets.STG_PROJECT_ID }}
   PROD_PROJECT_ID: ${{ secrets.PROD_PROJECT_ID }}
-on:
-  workflow_dispatch:
-    inputs:
-      approve:
-        description: 'Approved by'
-        required: true
-        type: choice
-        options: ['pravin135']
-
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       approve:
+#         description: 'Approved by'
+#         required: true
+#         type: choice
+#         options: ['pravin135']
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production  # 🔐 Only approvers can proceed!
+    steps:
+      - name: Check permissions
+        run: echo "This job can ONLY run if an approver approves it!"
 # on:
 #   workflow_dispatch:
 #     # Optional inputs for manual promotion, e.g., to override the default image tag
