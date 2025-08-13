@@ -1,10 +1,10 @@
 name: CI Build and Push (Staging)
-# on:
-#   push:
-#     branches:
-#       - stage
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - stage
+# on:
+#   workflow_dispatch:
 env:
   PROJECT_ID: praveen-345
   PROJECT_NUMBER: 915484313024
