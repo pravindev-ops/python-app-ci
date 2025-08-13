@@ -42,7 +42,7 @@ jobs:
           docker build -t $REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG .
           docker push $REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
           
-      - name: Update staging manifest
+      - name: Update staging manifest task
         run: |
           FULL_IMAGE="$REPO_URL/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ env.IMAGE_TAG }}"
           echo "Using image: $FULL_IMAGE"
