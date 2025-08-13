@@ -48,7 +48,7 @@ jobs:
           echo "Using image: $FULL_IMAGE"
           sed -i "s|image:.*|image: $FULL_IMAGE|" manifests/stage/deployment.yaml
 
-      - name: Set git identity
+      - name: Set git identity task
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
