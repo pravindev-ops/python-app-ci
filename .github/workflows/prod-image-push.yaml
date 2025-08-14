@@ -83,8 +83,8 @@ jobs:
         id: auth-stage
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/915484313024/locations/global/workloadIdentityPools/my-pool/providers/my-provider 
-          service_account: gke-workload@praveen-345.iam.gserviceaccount.com
+          workload_identity_provider: projects/1075858964756/locations/global/workloadIdentityPools/github-pool/providers/github-provider 
+          service_account: githubactions-sa@gke-arena.iam.gserviceaccount.com
       - name: Configure gcloud
         run: |
           gcloud config set project $STG_PROJECT_ID
